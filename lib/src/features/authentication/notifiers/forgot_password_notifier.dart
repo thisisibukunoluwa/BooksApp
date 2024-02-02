@@ -8,25 +8,25 @@ import '../../../services/snackbar_service.dart';
 import '../states/forgot_password_state.dart';
 
 class ForgotPasswordNotifier extends StateNotifier<ForgotPasswordState> {
-  ForgotPasswordNotifier(this._read) : super(ForgotPasswordState.initial());
+  ForgotPasswordNotifier(this._ref) : super(ForgotPasswordState.initial());
 
-  final Reader _read;
+  final Ref _ref;
 
   Future<void> resetPassword(String emailAddress) async {
     state = state.copyWith(viewState: ViewState.loading);
 
     try {
-      await _read(authenticationRepository).resetPassword(emailAddress.trim());
+      await _ref.read(authenticationRepository).resetPassword(emailAddress.trim());
 
-      _read(navigationService).navigateBack();
+      _ref.read(navigationService).navigateBack();
 
-      _read(snackbarService).showSuccessSnackBar(
+      _ref.read(snackbarService).showSuccessSnackBar(
         'Instructions to reset your password has been sent to your email',
       );
     } on Failure catch (ex) {
-      _read(navigationService).navigateBack();
+      _ref.read(navigationService).navigateBack();
 
-      _read(snackbarService).showErrorSnackBar(ex.message);
+      _ref.read(snackbarService).showErrorSnackBar(ex.message);
     } finally {
       state = state.copyWith(viewState: ViewState.idle);
     }
@@ -35,5 +35,5 @@ class ForgotPasswordNotifier extends StateNotifier<ForgotPasswordState> {
 
 final forgotPasswordNotifierProvider = StateNotifierProvider.autoDispose<
     ForgotPasswordNotifier, ForgotPasswordState>(
-  (ref) => ForgotPasswordNotifier(ref.read),
+  (ref) => ForgotPasswordNotifier(ref),
 );

@@ -10,9 +10,9 @@ import '../models/user_params.dart';
 import '../states/register_state.dart';
 
 class RegisterNotifier extends StateNotifier<RegisterState> {
-  RegisterNotifier(this._read) : super(RegisterState.initial());
+  RegisterNotifier(this._ref) : super(RegisterState.initial());
 
-  final Reader _read;
+  final Ref _ref;
 
   void togglePasswordVisibility() =>
       state = state.copyWith(passwordVisible: !state.passwordVisible);
@@ -21,14 +21,14 @@ class RegisterNotifier extends StateNotifier<RegisterState> {
     state = state.copyWith(viewState: ViewState.loading);
 
     try {
-      await _read(authenticationRepository).register(params: userParams);
+      await _ref.read(authenticationRepository).register(params: userParams);
 
-      _read(navigationService).navigateOffAllNamed(
+      _ref.read(navigationService).navigateOffAllNamed(
         Routes.verifyEmail,
         (_) => false,
       );
     } on Failure catch (ex) {
-      _read(snackbarService).showErrorSnackBar(ex.message);
+      _ref.read(snackbarService).showErrorSnackBar(ex.message);
     } finally {
       state = state.copyWith(viewState: ViewState.idle);
     }
@@ -36,10 +36,10 @@ class RegisterNotifier extends StateNotifier<RegisterState> {
 
   /// Register was pushed on to the navigation stack, so here we are just
   /// ...popping it off the stack to return to login
-  void navigateToLogin() => _read(navigationService).navigateBack();
+  void navigateToLogin() => _ref.read(navigationService).navigateBack();
 }
 
 final registerNotifierProvider =
     StateNotifierProvider.autoDispose<RegisterNotifier, RegisterState>(
-  (ref) => RegisterNotifier(ref.read),
+  (ref) => RegisterNotifier(ref),
 );

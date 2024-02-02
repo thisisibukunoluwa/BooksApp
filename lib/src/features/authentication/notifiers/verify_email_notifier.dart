@@ -5,18 +5,18 @@ import '../../../repositories/authentication_repository.dart';
 import '../../../services/navigation_service.dart';
 
 class VerifyEmailNotifier extends StateNotifier<void> {
-  VerifyEmailNotifier(this._read) : super(null);
+  VerifyEmailNotifier(this._ref) : super(null);
 
-  final Reader _read;
+  final Ref _ref;
 
   Future<void> navigateToLogin() async {
-    await _read(authenticationRepository).logout();
+    await _ref.read(authenticationRepository).logout();
 
-    _read(navigationService).navigateOffNamed(Routes.login);
+    _ref.read(navigationService).navigateOffNamed(Routes.login);
   }
 }
 
 final verifyEmailNotifierProvider =
     StateNotifierProvider.autoDispose<VerifyEmailNotifier, void>(
-  (ref) => VerifyEmailNotifier(ref.read),
+  (ref) => VerifyEmailNotifier(ref),
 );
