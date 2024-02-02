@@ -10,16 +10,16 @@ import '../../../services/snackbar_service.dart';
 import '../states/profile_state.dart';
 
 class ProfileNotifier extends StateNotifier<ProfileState> {
-  ProfileNotifier(this._read) : super(ProfileState.initial());
+  ProfileNotifier(this._ref) : super(ProfileState.initial());
 
-  final Reader _read;
+  final Ref _ref;
 
-  User get user => _read(authenticationRepository).currentUser!;
+  User get user => _ref.read(authenticationRepository).currentUser!;
 
   Future<void> logoutUser() async {
-    await _read(authenticationRepository).logout();
+    await _ref.read(authenticationRepository).logout();
 
-    _read(navigationService).navigateOffAllNamed(
+    _ref.read(navigationService).navigateOffAllNamed(
       Routes.login,
       (_) => false,
     );
@@ -29,16 +29,16 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     try {
       state = state.copyWith(viewState: ViewState.loading);
 
-      final message = await _read(authenticationRepository).deleteUser();
+      final message = await _ref.read(authenticationRepository).deleteUser();
 
-      _read(navigationService).navigateOffAllNamed(
+      _ref.read(navigationService).navigateOffAllNamed(
         Routes.login,
         (_) => false,
       );
 
-      _read(snackbarService).showSuccessSnackBar(message);
+      _ref.read(snackbarService).showSuccessSnackBar(message);
     } on Failure catch (f) {
-      _read(snackbarService).showErrorSnackBar(f.message);
+      _ref.read(snackbarService).showErrorSnackBar(f.message);
     } finally {
       state = state.copyWith(viewState: ViewState.idle);
     }
@@ -47,5 +47,5 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 
 final profileNotifierProvider =
     StateNotifierProvider.autoDispose<ProfileNotifier, ProfileState>(
-  (ref) => ProfileNotifier(ref.read),
+  (ref) => ProfileNotifier(ref),
 );

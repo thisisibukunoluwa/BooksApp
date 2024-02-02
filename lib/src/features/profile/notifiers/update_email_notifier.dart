@@ -9,9 +9,9 @@ import '../../../services/snackbar_service.dart';
 import '../states/update_email_state.dart';
 
 class UpdateEmailNotifier extends StateNotifier<UpdateEmailState> {
-  UpdateEmailNotifier(this._read) : super(UpdateEmailState.initial());
+  UpdateEmailNotifier(this._ref) : super(UpdateEmailState.initial());
 
-  final Reader _read;
+  final Ref _ref;
 
   void togglePasswordVisibility() =>
       state = state.copyWith(passwordVisible: !state.passwordVisible);
@@ -20,23 +20,23 @@ class UpdateEmailNotifier extends StateNotifier<UpdateEmailState> {
     state = state.copyWith(viewState: ViewState.loading);
 
     try {
-      await _read(authenticationRepository).updateEmail(
+      await _ref.read(authenticationRepository).updateEmail(
         newEmailAddress: emailAddress,
         password: password,
       );
 
-      _read(navigationService).navigateOffAllNamed(
+      _ref.read(navigationService).navigateOffAllNamed(
         Routes.verifyEmail,
         (_) => false,
       );
 
-      _read(snackbarService).showSuccessSnackBar(
+      _ref.read(snackbarService).showSuccessSnackBar(
         'Email Update Successful! Verify and Login Again',
       );
     } on Failure catch (ex) {
-      _read(navigationService).navigateBack();
+      _ref.read(navigationService).navigateBack();
 
-      _read(snackbarService).showErrorSnackBar(ex.message);
+      _ref.read(snackbarService).showErrorSnackBar(ex.message);
     } finally {
       state = state.copyWith(viewState: ViewState.idle);
     }
@@ -45,5 +45,5 @@ class UpdateEmailNotifier extends StateNotifier<UpdateEmailState> {
 
 final updateEmailNotifierProvider =
     StateNotifierProvider.autoDispose<UpdateEmailNotifier, UpdateEmailState>(
-  (ref) => UpdateEmailNotifier(ref.read),
+  (ref) => UpdateEmailNotifier(ref),
 );

@@ -5,17 +5,17 @@ import '../models/favorite_book.dart';
 import '../states/favorite_books_state.dart';
 
 class FavoriteBooksNotitier extends StateNotifier<FavoriteBooksState> {
-  FavoriteBooksNotitier(this._read, {required this.bookId})
+  FavoriteBooksNotitier(this._ref, {required this.bookId})
       : super(FavoriteBooksState.initial()) {
     checkIsFavorite(bookId);
   }
 
-  final Reader _read;
+  final Ref _ref;
 
   final String bookId;
 
   Future<void> checkIsFavorite(String bookId) async {
-    final isFavorite = await _read(favoriteBooksRepository).bookExists(bookId);
+    final isFavorite = await _ref.read(favoriteBooksRepository).bookExists(bookId);
     state = state.copyWith(isFavorite: isFavorite);
   }
 
@@ -28,13 +28,13 @@ class FavoriteBooksNotitier extends StateNotifier<FavoriteBooksState> {
   }
 
   Future<void> addBookToFavorite(FavoriteBook favoriteBook) async {
-    await _read(favoriteBooksRepository).addBookToFavorite(favoriteBook);
+    await _ref.read(favoriteBooksRepository).addBookToFavorite(favoriteBook);
 
     await checkIsFavorite(favoriteBook.id);
   }
 
   Future<void> removeBookFromFavorite(FavoriteBook favoriteBook) async {
-    await _read(favoriteBooksRepository).removeBookFromFavorite(favoriteBook);
+    await _ref.read(favoriteBooksRepository).removeBookFromFavorite(favoriteBook);
 
     await checkIsFavorite(favoriteBook.id);
   }
@@ -42,5 +42,5 @@ class FavoriteBooksNotitier extends StateNotifier<FavoriteBooksState> {
 
 final favoriteBooksNotifierProvider = StateNotifierProvider.family<
     FavoriteBooksNotitier, FavoriteBooksState, String>(
-  (ref, bookId) => FavoriteBooksNotitier(ref.read, bookId: bookId),
+  (ref, bookId) => FavoriteBooksNotitier(ref, bookId: bookId),
 );

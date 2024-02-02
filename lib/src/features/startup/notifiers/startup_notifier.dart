@@ -4,13 +4,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../repositories/authentication_repository.dart';
 
 class StartupNotifier extends StateNotifier<void> {
-  StartupNotifier(this._read) : super(null);
+  StartupNotifier(this._ref) : super(null);
 
-  final Reader _read;
+  final Ref _ref;
 
-  User? get currentUser => _read(authenticationRepository).currentUser;
+  User? get currentUser => _ref.read(authenticationRepository).currentUser;
 }
 
 final startupNotifierProvider = StateNotifierProvider<StartupNotifier, void>(
-  (ref) => StartupNotifier(ref.read),
+  (ref) => StartupNotifier(ref),
 );

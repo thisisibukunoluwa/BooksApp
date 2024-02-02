@@ -8,11 +8,11 @@ import '../../../services/snackbar_service.dart';
 import '../states/books_state.dart';
 
 class BooksNotitier extends StateNotifier<BooksState> {
-  BooksNotitier(this._read) : super(BooksState.initial()) {
+  BooksNotitier(this._ref) : super(BooksState.initial()) {
     getBooks();
   }
 
-  final Reader _read;
+  final Ref _ref;
 
   Future<void> getBooks({String query = AppStrings.defaultBooksQuery}) async {
     try {
@@ -22,7 +22,7 @@ class BooksNotitier extends StateNotifier<BooksState> {
         currentPage: 1,
       );
 
-      final books = await _read(booksRepository).getBooks(
+      final books = await _ref.read(booksRepository).getBooks(
         currentPage: state.currentPage,
         queryString: query,
       );
@@ -43,14 +43,14 @@ class BooksNotitier extends StateNotifier<BooksState> {
 
   Future<void> getMoreBooks() async {
     try {
-      final books = await _read(booksRepository).getBooks(
+      final books = await _ref.read(booksRepository).getBooks(
         queryString: state.searchQuery,
         currentPage: state.currentPage,
       );
 
       if (books.isEmpty) {
         state = state.copyWith(moreDataAvailable: false);
-        _read(snackbarService)
+        _ref.read(snackbarService)
             .showErrorSnackBar('You have reached the end of the book list');
       }
 
@@ -65,5 +65,5 @@ class BooksNotitier extends StateNotifier<BooksState> {
 }
 
 final booksNotifierProvider = StateNotifierProvider<BooksNotitier, BooksState>(
-  (ref) => BooksNotitier(ref.read),
+  (ref) => BooksNotitier(ref),
 );

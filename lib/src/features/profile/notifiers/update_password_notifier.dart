@@ -8,9 +8,9 @@ import '../../../services/snackbar_service.dart';
 import '../states/update_password_state.dart';
 
 class UpdatePasswordNotifier extends StateNotifier<UpdatePasswordState> {
-  UpdatePasswordNotifier(this._read) : super(UpdatePasswordState.initial());
+  UpdatePasswordNotifier(this._ref) : super(UpdatePasswordState.initial());
 
-  final Reader _read;
+  final Ref _ref;
 
   void toggleOldPasswordVisibility() =>
       state = state.copyWith(oldPasswordVisible: !state.oldPasswordVisible);
@@ -22,18 +22,18 @@ class UpdatePasswordNotifier extends StateNotifier<UpdatePasswordState> {
     state = state.copyWith(viewState: ViewState.loading);
 
     try {
-      await _read(authenticationRepository).updatePassword(
+      await _ref.read(authenticationRepository).updatePassword(
         oldPassword: oldPassword,
         newPassword: newPassword,
       );
 
-      _read(navigationService).navigateBack();
+      _ref.read(navigationService).navigateBack();
 
-      _read(snackbarService).showSuccessSnackBar('Password Update Successful');
+      _ref.read(snackbarService).showSuccessSnackBar('Password Update Successful');
     } on Failure catch (ex) {
-      _read(navigationService).navigateBack();
+      _ref.read(navigationService).navigateBack();
 
-      _read(snackbarService).showErrorSnackBar(ex.message);
+      _ref.read(snackbarService).showErrorSnackBar(ex.message);
     } finally {
       state = state.copyWith(viewState: ViewState.idle);
     }
@@ -42,5 +42,5 @@ class UpdatePasswordNotifier extends StateNotifier<UpdatePasswordState> {
 
 final updatePasswordNotifierProvider = StateNotifierProvider.autoDispose<
     UpdatePasswordNotifier, UpdatePasswordState>(
-  (ref) => UpdatePasswordNotifier(ref.read),
+  (ref) => UpdatePasswordNotifier(ref),
 );

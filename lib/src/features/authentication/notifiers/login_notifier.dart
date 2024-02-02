@@ -9,9 +9,9 @@ import '../../../services/snackbar_service.dart';
 import '../states/login_state.dart';
 
 class LoginNotifier extends StateNotifier<LoginState> {
-  LoginNotifier(this._read) : super(LoginState.initial());
+  LoginNotifier(this._ref) : super(LoginState.initial());
 
-  final Reader _read;
+  final Ref _ref;
 
   void togglePasswordVisibility() =>
       state = state.copyWith(passwordVisible: !state.passwordVisible);
@@ -23,14 +23,14 @@ class LoginNotifier extends StateNotifier<LoginState> {
     state = state.copyWith(viewState: ViewState.loading);
 
     try {
-      await _read(authenticationRepository).login(
+      await _ref.read(authenticationRepository).login(
         emailAddress: emailAddress.trim(),
         password: password,
       );
 
-      _read(navigationService).navigateOffNamed(Routes.home);
+      _ref.read(navigationService).navigateOffNamed(Routes.home);
     } on Failure catch (ex) {
-      _read(snackbarService).showErrorSnackBar(ex.message);
+      _ref.read(snackbarService).showErrorSnackBar(ex.message);
     } finally {
       state = state.copyWith(viewState: ViewState.idle);
     }
@@ -38,26 +38,26 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   Future<void> loginUserWithGoogle() async {
     try {
-      final user = await _read(authenticationRepository).loginWithGoogle();
+      final user = await _ref.read(authenticationRepository).loginWithGoogle();
 
       if (user != null) {
-        _read(navigationService).navigateOffNamed(Routes.home);
+        _ref.read(navigationService).navigateOffNamed(Routes.home);
       } else {
-        _read(snackbarService).showErrorSnackBar('No email selected');
+        _ref.read(snackbarService).showErrorSnackBar('No email selected');
       }
     } on Failure catch (ex) {
-      _read(snackbarService).showErrorSnackBar(ex.message);
+      _ref.read(snackbarService).showErrorSnackBar(ex.message);
     } finally {
       state = state.copyWith(viewState: ViewState.idle);
     }
   }
 
   void navigateToRegister() {
-    _read(navigationService).navigateToNamed(Routes.register);
+    _ref.read(navigationService).navigateToNamed(Routes.register);
   }
 }
 
 final loginNotifierProvider =
     StateNotifierProvider.autoDispose<LoginNotifier, LoginState>(
-  (ref) => LoginNotifier(ref.read),
+  (ref) => LoginNotifier(ref),
 );
